@@ -6,28 +6,41 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.30.0'  # 改回 3.30.0
-          channel: 'stable'
-      
+
+      # 使用 Flutter 社区镜像安装
+      - name: Install Flutter SDK
+        run: |
+          # 使用 Flutter 官方 GitHub 镜像（GitHub 内部访问稳定）
+          $gitUrl = "https://github.com/flutter/flutter.git"
+          $flutterPath = "$env:GITHUB_WORKSPACE\flutter"
+          
+          # 克隆 Flutter 仓库（指定版本）
+          git clone --depth 1 --branch stable $gitUrl $flutterPath
+          
+          # 添加到 PATH
+          echo "$flutterPath\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          
+          # 运行 flutter doctor 完成初始化
+          flutter doctor
+          
+          # 验证版本
+          flutter --version
+
       - name: Setup Rust (nightly)
         run: |
           rustup default nightly
           rustc --version
-      
+
       - name: Install dependencies
         run: flutter pub get
-      
+
       - name: Build Windows
         run: flutter build windows --release
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
