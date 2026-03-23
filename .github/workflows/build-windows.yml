@@ -11,24 +11,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 使用 Flutter 社区镜像安装
       - name: Install Flutter SDK
         run: |
-          # 使用 Flutter 官方 GitHub 镜像（GitHub 内部访问稳定）
-          $gitUrl = "https://github.com/flutter/flutter.git"
-          $flutterPath = "$env:GITHUB_WORKSPACE\flutter"
+          # 克隆 Flutter 到固定路径
+          git clone --depth 1 --branch stable https://github.com/flutter/flutter.git C:\flutter
           
-          # 克隆 Flutter 仓库（指定版本）
-          git clone --depth 1 --branch stable $gitUrl $flutterPath
+          # 将 Flutter 添加到系统 PATH（永久生效）
+          echo "C:\flutter\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           
-          # 添加到 PATH
-          echo "$flutterPath\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          # 同时为当前会话添加 PATH（确保后续命令能找到）
+          $env:Path += ";C:\flutter\bin"
           
-          # 运行 flutter doctor 完成初始化
-          flutter doctor
-          
-          # 验证版本
-          flutter --version
+          # 验证安装
+          C:\flutter\bin\flutter --version
 
       - name: Setup Rust (nightly)
         run: |
@@ -36,10 +31,15 @@ jobs:
           rustc --version
 
       - name: Install dependencies
-        run: flutter pub get
+        run: |
+          # 确保 PATH 包含 Flutter
+          $env:Path += ";C:\flutter\bin"
+          flutter pub get
 
       - name: Build Windows
-        run: flutter build windows --release
+        run: |
+          $env:Path += ";C:\flutter\bin"
+          flutter build windows --release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
