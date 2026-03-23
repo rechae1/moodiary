@@ -41,7 +41,7 @@ dependencies:
   isar_flutter_libs:
     git:
     url: https://github.com/ZhuJHua/isar
-    ref: fc323a5660b9987fd4d137f71b0d3dbad0915e4f
+    path: packages/isar_flutter_libs
   cached_network_image: 3.4.1
   audioplayers: 6.4.0
   record: 6.0.0
