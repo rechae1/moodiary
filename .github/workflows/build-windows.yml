@@ -1,0 +1,34 @@
+name: Build Windows App
+
+on:
+  workflow_dispatch:  # 手动触发，点一下按钮就开始
+
+jobs:
+  build-windows:
+    runs-on: windows-latest  # 使用 Windows 运行器，完全免费
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.0'
+      
+      - name: Setup Rust (nightly)
+        run: |
+          rustup default nightly
+          rustc --version
+      
+      - name: Install dependencies
+        run: flutter pub get
+      
+      - name: Build Windows
+        run: flutter build windows --release
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: moodiary-windows
+          path: build/windows/runner/Release/
