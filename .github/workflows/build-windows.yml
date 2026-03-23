@@ -1,11 +1,11 @@
 name: Build Windows App
 
 on:
-  workflow_dispatch:  # 手动触发，点一下按钮就开始
+  workflow_dispatch:
 
 jobs:
   build-windows:
-    runs-on: windows-latest  # 使用 Windows 运行器，完全免费
+    runs-on: windows-latest
     
     steps:
       - name: Checkout code
@@ -14,7 +14,8 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.30.1'
+          flutter-version: '3.30.0'  # 改回 3.30.0
+          channel: 'stable'
       
       - name: Setup Rust (nightly)
         run: |
